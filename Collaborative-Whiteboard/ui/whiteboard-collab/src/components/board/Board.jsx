@@ -6,7 +6,9 @@ import './style.css';
 class Board extends React.Component {
 
     timeout;
-    socket = io.connect("http://192.168.0.19:3000/"); //"http://66.71.120.48:3000"
+
+    //Change it with your local IP and desired port number
+    socket = io.connect("http://192.168.0.19:3000/"); 
 
     ctx;
     isDrawing = false;
@@ -14,13 +16,18 @@ class Board extends React.Component {
     constructor(props) {
         super(props);
 
+        //socket created for the canvas data
         this.socket.on("canvas-data", function(data){
 
             var root = this;
             var interval = setInterval(function(){
+
+                //do nothing when the client is drawing on the board
                 if(root.isDrawing) return;
                 root.isDrawing = true;
                 clearInterval(interval);
+
+                //Extract whiteboard data in form of Image
                 var image = new Image();
                 var canvas = document.querySelector('#board');
                 var ctx = canvas.getContext('2d');
@@ -39,6 +46,7 @@ class Board extends React.Component {
     }
 
     componentWillReceiveProps(newProps) {
+        //newProps contains whiteboard color and brush size properties
         this.ctx.strokeStyle = newProps.color;
         this.ctx.lineWidth = newProps.size;
     }
@@ -46,6 +54,7 @@ class Board extends React.Component {
     
 
     drawOnCanvas() {
+        // Get components by id
         var canvas = document.querySelector('#board');
         this.ctx = canvas.getContext('2d');
         var ctx = this.ctx;
@@ -61,7 +70,7 @@ class Board extends React.Component {
         var last_mouse = {x: 0, y: 0};
 
         
-        /* Mouse Capturing Work */
+        // Mouse capturing work based on user's movement on the whiteboard
         canvas.addEventListener('mousemove', function(e) {
             last_mouse.x = mouse.x;
             last_mouse.y = mouse.y;
@@ -70,7 +79,7 @@ class Board extends React.Component {
             mouse.y = e.pageY - this.offsetTop;
         }, false);
 
-         /* touch Capturing Work */
+         // Touch capturing work based on user's movement on the whiteboard
          canvas.addEventListener('touchmove', function(e) {
             last_mouse.x = mouse.x;
             last_mouse.y = mouse.y;
@@ -80,12 +89,13 @@ class Board extends React.Component {
         }, false);
 
         
-        /* Drawing on Paint App */
+        // Drawing on the whiteboard using brush and color property selected by the user
         ctx.lineWidth = this.props.size;
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
         ctx.strokeStyle = this.props.color;
 
+        // Recording the user's movement using mouse and/or touch
         canvas.addEventListener('mousedown', function(e) {
             canvas.addEventListener('mousemove', onPaint, false);
         }, false);
@@ -116,16 +126,22 @@ class Board extends React.Component {
 
             if(root.timeout !== undefined) clearTimeout(root.timeout);
             root.timeout = setTimeout(function(){
+
+                // Compressing the whiteboard data before sending it to the server
                 var base64ImageData = canvas.toDataURL("image/png");
                 root.socket.emit("canvas-data", base64ImageData);
             }, 1000)
+            // Data is sent from client to server exactly 1 second after user stops drawing on the whiteboard
         };
 
+
+        // Reset the canvas
         resetBtn.addEventListener('click',function() {
             console.log("erasing");
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            // var base64ImageData = canvas.toDataURL("image/png");
-            //     root.socket.emit("canvas-data", base64ImageData);
+
+            var base64ImageData = canvas.toDataURL("image/png");
+                root.socket.emit("canvas-data", base64ImageData);
         }, false)
 
     }
@@ -142,149 +158,3 @@ class Board extends React.Component {
 }
 
 export default Board
-
-// import React from 'react';
-// import io from 'socket.io-client';
-
-// import './style.css';
-
-// class Board extends React.Component {
-
-//     timeout;
-//     socket = io.connect("http://192.168.0.6:3000");
-
-//     ctx;
-//     isDrawing = false;
-
-//     constructor(props) {
-//         super(props);
-
-//         this.socket.on("canvas-data", (data) => {
-//             var root = this;
-//             var interval = setInterval(() => {
-//                 if (root.isDrawing) return;
-//                 root.isDrawing = true;
-//                 clearInterval(interval);
-//                 var image = new Image();
-//                 var canvas = document.querySelector('#board');
-//                 var ctx = canvas.getContext('2d');
-//                 image.onload = function() {
-//                     ctx.drawImage(image, 0, 0);
-
-//                     root.isDrawing = false;
-//                 };
-//                 image.src = data;
-//             }, 200)
-//         })
-//     }
-
-//     componentDidMount() {
-//         this.drawOnCanvas();
-//     }
-
-//     componentWillReceiveProps(newProps) {
-//         this.ctx.strokeStyle = newProps.color;
-//         this.ctx.lineWidth = newProps.size;
-//     }
-
-//     drawOnCanvas() {
-//         var canvas = document.querySelector('#board');
-//         this.ctx = canvas.getContext('2d');
-//         var ctx = this.ctx;
-
-//         var resetBtn = document.querySelector('#ResetButton');
-
-//         var sketch = document.querySelector('#sketch');
-//         var sketch_style = getComputedStyle(sketch);
-//         canvas.width = parseInt(sketch_style.getPropertyValue('width'));
-//         canvas.height = parseInt(sketch_style.getPropertyValue('height'));
-
-//         var mouse = {x: 0, y: 0};
-//         var last_mouse = {x: 0, y: 0};
-
-//         /* Mouse and Touch Capturing Work */
-//         canvas.addEventListener('mousemove', onMouseMove, false);
-//         canvas.addEventListener('mousedown', onMouseDown, false);
-//         canvas.addEventListener('mouseup', onMouseUp, false);
-
-//         canvas.addEventListener('touchmove', onTouchMove, false);
-//         canvas.addEventListener('touchstart', onTouchStart, false);
-//         canvas.addEventListener('touchend', onTouchEnd, false);
-
-//         function onMouseMove(e) {
-//             last_mouse.x = mouse.x;
-//             last_mouse.y = mouse.y;
-
-//             mouse.x = e.pageX - this.offsetLeft;
-//             mouse.y = e.pageY - this.offsetTop;
-//         }
-
-//         function onMouseDown(e) {
-//             canvas.addEventListener('mousemove', onPaint, false);
-//         }
-
-//         function onMouseUp() {
-//             canvas.removeEventListener('mousemove', onPaint, false);
-//         }
-
-//         function onTouchMove(e) {
-//             last_mouse.x = mouse.x;
-//             last_mouse.y = mouse.y;
-
-//             mouse.x = e.touches[0].clientX - this.offsetLeft;
-//             mouse.y = e.touches[0].clientY - this.offsetTop;
-//         }
-
-//         function onTouchStart(e) {
-//             mouse.x = e.touches[0].clientX - this.offsetLeft;
-//             mouse.y = e.touches[0].clientY - this.offsetTop;
-
-//             canvas.addEventListener('touchmove', onPaint, false);
-//         }
-
-//         function onTouchEnd() {
-//             canvas.removeEventListener('touchmove', onPaint, false);
-//         }
-
-//         /* Drawing on Paint App */
-//         ctx.lineWidth = this.props.size;
-//         ctx.lineJoin = 'round';
-//         ctx.lineCap = 'round';
-//         ctx.strokeStyle = this.props.color;
-
-//         var root = this;
-//         var onPaint = function() {
-//             ctx.beginPath();
-//             ctx.moveTo(last_mouse.x, last_mouse.y);
-//             ctx.lineTo(mouse.x, mouse.y);
-//             ctx.closePath();
-//             ctx.stroke();
-
-//             if(root.timeout !== undefined) clearTimeout(root.timeout);
-//             root.timeout = setTimeout(function(){
-//                 var base64ImageData = canvas.toDataURL("image/png");
-//                 root.socket.emit("canvas-data", base64ImageData);
-//             }, 1000)
-//         };
-
-//         resetBtn.addEventListener('click',function() {
-//             console.log("erasing");
-//             ctx.clearRect(0, 0, canvas.width, canvas.height);
-//             // var base64ImageData = canvas.toDataURL("image/png");
-//             //     root.socket.emit("canvas-data", base64ImageData);
-//         }, false)
-
-//     }
-
-//     render() {
-//         return (           
-//                 <div class="sketch" id="sketch">
-//                 <canvas className="board" id="board"></canvas>
-           
-//             </div>
-            
-//         )
-//     }
-// }
-
-// export default Board
