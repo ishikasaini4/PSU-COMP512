@@ -1,5 +1,5 @@
 # PSU-COMP512
----------------------------------COLLABORATIVE VIRTUAL WHITEBOARD--------------------------------------------
+---------------------------COLLABORATIVE VIRTUAL WHITEBOARD-----------------------------------
 
 
 1. Install VS Code from "https://code.visualstudio.com/download"
