@@ -1,0 +1,97 @@
+.container {
+    position:fixed;
+    width: 100%;
+    height: 100%; 
+    background-color: whitesmoke;
+    max-width: 100%;
+}
+
+.nav-wrapper{
+    padding: 0;
+    padding-left: 10px;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.navbar-brand{
+    padding-left: 2%;
+}
+
+.navbar{
+    width: 100%;
+    background-color: rgb(32, 66, 178);
+}
+
+
+.row{
+    margin: 2rem;
+}
+
+.color-picker-container {
+    text-align: center;
+    display: inline;
+    color:  rgb(32, 66, 178);
+}
+
+.brushsize-container {
+    display: inline;
+    color:  rgb(32, 66, 178);
+    margin-left: 12px;
+}
+
+select{
+    text-decoration:  rgb(32, 66, 178);
+    display: inline;
+    height: 2rem;
+    width: 3rem;
+}
+
+.tools-section {
+    text-align: center;
+}
+
+.btn:hover{
+    background-color:white !important;
+    color:  rgb(32, 66, 178) !important;
+}
+
+.btn, .btn:visited{
+    margin: 2%;
+    background-color:  rgb(32, 66, 178) !important;
+}
+
+.board-container {
+    width: 92%;
+    height: 67%;
+    margin: auto;
+    background: black;
+    border-radius: 3rem;
+    border: 5;
+}
+
+@media screen and (max-width: 600px) {
+  /* Styles for mobile screens */
+  .row {
+    margin: 1rem;
+  }
+  
+  .col {
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .color-picker-container, .brushsize-container, .buttonBar {
+    margin: 0;
+    display: block;
+  }
+  
+  select {
+    margin-left: 0;
+  }
+  
+  .board-container {
+    height: 50%;
+  }
+}
+
